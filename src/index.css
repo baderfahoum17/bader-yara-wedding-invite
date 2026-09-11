@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wine: #3d0f12;
+  --color-wine-deep: #2a090b;
+  --color-burgundy: #5a1a20;
+  --color-gold: #c9a45c;
+  --color-gold-light: #e6c98a;
+  --color-rose-gold: #b76e79;
+  --color-rose-gold-light: #d49aa3;
+  --color-blush: #f7e4e1;
+  --color-blush-deep: #f1d3cf;
+  --color-ivory: #fbf5f0;
+  --color-ink: #4a1c22;
+
+  --font-display: "Playfair Display", "Georgia", serif;
+  --font-script: "Great Vibes", cursive;
+  --font-body: "Cormorant Garamond", "Georgia", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-wine-deep);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+body.envelope-closed {
+  overflow: hidden;
+  height: 100dvh;
+}
+
+/* Subtle paper / velvet texture over the burgundy page */
+.texture-wine {
+  background-color: var(--color-wine-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(201, 164, 92, 0.16), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(183, 110, 121, 0.14), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.85 0 0 0 0 0.6 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.texture-blush {
+  background-color: var(--color-blush);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.gold-foil {
+  background: linear-gradient(135deg, #8a6a2c 0%, #e6c98a 25%, #c9a45c 50%, #f3e2b3 70%, #a5813c 100%);
+}
+
+.gold-text {
+  background: linear-gradient(120deg, #a5813c 0%, #e6c98a 40%, #c9a45c 60%, #f3e2b3 80%, #a5813c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.wax-seal {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.35), transparent 35%),
+    radial-gradient(circle at 65% 75%, rgba(0, 0, 0, 0.35), transparent 45%),
+    radial-gradient(circle, #c98088 0%, #b76e79 45%, #8f4c58 100%);
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(0, 0, 0, 0.35),
+    0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
