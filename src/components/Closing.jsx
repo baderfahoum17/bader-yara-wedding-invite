@@ -14,7 +14,7 @@ export default function Closing() {
         <div className="w-44 overflow-hidden rounded-[1.75rem] bg-white p-1.5 shadow-[0_40px_70px_-30px_rgba(58,64,50,0.5)] md:w-60">
           <motion.img
             src={trunksPhoto}
-            alt={`${trunks.name}, an English Cocker Spaniel, smiling at the camera`}
+            alt={`${trunks.name}, an English Cocker Spaniel, sitting and offering a paw`}
             className="block aspect-[3/4] w-full rounded-[1.4rem] object-cover object-[50%_45%]"
             initial={{ scale: 1.12 }}
             whileInView={{ scale: 1 }}

@@ -60,6 +60,14 @@ for (const dev of devices) {
   r.mapLoaded = Boolean(mapFrame) && (await mapFrame.locator('body *').count()) > 0
   await page.locator('#venue').screenshot({ path: join(outDir, `${name}-03-venue.png`) })
   r.cameoImg = await page.locator('#cameo img').evaluate((i) => i.complete && i.naturalWidth > 0)
+  r.cameo = await page.locator('#cameo img').evaluate((i) => ({
+    src: i.currentSrc.split('/').pop(),
+    natural: `${i.naturalWidth}x${i.naturalHeight}`,
+    box: `${Math.round(i.getBoundingClientRect().width)}x${Math.round(i.getBoundingClientRect().height)}`,
+  }))
+  await page.locator('#closing').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1600)
+  await page.locator('#closing').screenshot({ path: join(outDir, `${name}-06-closing.png`) })
 
   await page.evaluate(() => window.scrollTo(0, 0))
   await page.waitForTimeout(600)
