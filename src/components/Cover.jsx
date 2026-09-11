@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { couple, longDate, weekday } from '../content.js'
 import coverArt from '../assets/trunks-cover.jpg'
 import { ease } from '../motion.js'
@@ -12,13 +12,14 @@ const shadowGone = '0 20px 40px -20px rgba(58,64,50,0)'
 
 /**
  * Full-screen cover. The Trunks illustration sits on taupe linen like a card in hand,
- * closed by an olive wax seal on its bottom edge.
+ * closed by a flat olive monogram seal on its bottom edge.
  *
  * Load sequence is strictly ordered: card, florals, seal, then words. Idle motion is a
  * slow ring breathing off the seal and the florals swaying (CoverFlorals, CSS-driven).
  *
  * Opening sequence, one timeline from the tap:
- *   0.00s  seal cracks: a fissure draws across it, it swells, turns and gives way
+ *   0.00s  light blooms from the seal: a soft radial glow and a crisp ring expand
+ *          outward while the seal itself brightens, lifts a touch, then fades
  *   0.15s  card lifts toward the viewer (scale up, shadow deepens) ...
  *   0.50s  ... then recedes: shrinks, drops, blurs out
  *   0.15s  florals part outward and fade as the card lifts (CoverFlorals)
@@ -28,6 +29,7 @@ const shadowGone = '0 20px 40px -20px rgba(58,64,50,0)'
  */
 export default function Cover({ onOpened }) {
   const [stage, setStage] = useState('sealed') // sealed -> opening -> done
+  const reduceMotion = useReducedMotion()
 
   const open = () => {
     if (stage !== 'sealed') return
@@ -98,54 +100,82 @@ export default function Cover({ onOpened }) {
               </motion.figure>
               <CoverFlorals layer="front" opening={opening} />
 
-              {/* Wax seal on the bottom edge: the one tap target */}
+              {/* Flat olive seal on the bottom edge: the one tap target */}
               <div className="absolute left-1/2 top-full z-30 -translate-x-1/2 -translate-y-1/2">
                 <motion.button
                   type="button"
                   onClick={open}
                   aria-label="Open the invitation"
-                  className="relative block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-olive focus-visible:ring-offset-4 focus-visible:ring-offset-bone-deep"
-                  initial={{ opacity: 0, scale: 0.6, rotate: 0 }}
+                  className="group relative block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-olive focus-visible:ring-offset-4 focus-visible:ring-offset-bone-deep"
+                  initial={{ opacity: 0, scale: 0.6 }}
                   animate={
                     opening
-                      ? { opacity: [1, 1, 0], scale: [1, 1.08, 0.72], rotate: [0, -3, 9] }
-                      : { opacity: 1, scale: 1, rotate: 0 }
+                      ? reduceMotion
+                        ? { opacity: 0, scale: 1 }
+                        : { opacity: 0, scale: [1, 1.06, 0.94] }
+                      : { opacity: 1, scale: 1 }
                   }
                   transition={
                     opening
-                      ? { duration: 0.5, times: [0, 0.35, 1], ease: [0.4, 0, 0.9, 0.6] }
+                      ? {
+                          // Seal stays solid while the light blooms (first 150ms), then fades
+                          // out over the next 350ms as the card lifts.
+                          opacity: { duration: 0.35, delay: 0.15, ease: 'easeOut' },
+                          scale: { duration: 0.5, times: [0, 0.3, 1], ease: [0.22, 1, 0.36, 1] },
+                        }
                       : { duration: 0.8, ease, delay: 1.0 }
                   }
-                  whileTap={{ scale: 0.94 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.96 }}
                 >
-                  {!opening && (
+                  {/* Idle cue: a thin ring breathes outward every few seconds */}
+                  {!opening && !reduceMotion && (
                     <motion.span
                       aria-hidden="true"
-                      className="absolute inset-0 rounded-full border border-olive/70"
+                      className="absolute inset-0 rounded-full border border-olive/60"
                       initial={{ opacity: 0, scale: 1 }}
-                      animate={{ opacity: [0, 0.6, 0], scale: [1, 1.5, 1.7] }}
+                      animate={{ opacity: [0, 0.5, 0], scale: [1, 1.45, 1.65] }}
                       transition={{ duration: 2.6, ease: 'easeOut', delay: 2.4, repeat: Infinity, repeatDelay: 1.2 }}
                     />
                   )}
-                  <span className="wax-seal flex h-[88px] w-[88px] items-center justify-center rounded-full md:h-[104px] md:w-[104px]">
-                    <Monogram className="h-[50px] w-auto text-bone drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] md:h-[58px]" />
-                  </span>
-                  {/* Fissure across the wax */}
+
+                  {/* Press light: a soft bloom and a crisp ring expand out from the seal.
+                      Reduced motion: the bloom fades in and out in place, no expansion. */}
                   {opening && (
-                    <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
-                      <motion.path
-                        d="M12 38 L34 46 L46 34 L58 58 L74 50 L90 66"
-                        fill="none"
-                        stroke="#2c3026"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        initial={{ pathLength: 0, opacity: 0.9 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                    <>
+                      <motion.span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -inset-[35%] rounded-full"
+                        style={{
+                          background:
+                            'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(243,239,230,0.55) 38%, rgba(243,239,230,0) 68%)',
+                        }}
+                        initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.55 }}
+                        animate={
+                          reduceMotion
+                            ? { opacity: [0, 0.9, 0], scale: 1 }
+                            : { opacity: [0, 1, 0], scale: [0.55, 1.5, 2.4] }
+                        }
+                        transition={{ duration: 0.6, times: [0, 0.25, 1], ease: 'easeOut' }}
                       />
-                    </svg>
+                      {!reduceMotion && (
+                        <motion.span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 rounded-full border-2 border-bone"
+                          initial={{ opacity: 0.9, scale: 1 }}
+                          animate={{ opacity: 0, scale: 2.1 }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
+                        />
+                      )}
+                    </>
                   )}
+
+                  {/* The seal: flat olive disc, monogram in bone. Hover darkens a step;
+                      the press flash (seal-flash, CSS) lifts it a shade lighter and back. */}
+                  <span
+                    className={`relative z-10 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-olive text-bone transition-colors duration-300 group-hover:bg-olive-deep md:h-[104px] md:w-[104px] ${opening ? 'seal-flash' : ''}`}
+                  >
+                    <Monogram className="h-[50px] w-auto md:h-[58px]" />
+                  </span>
                 </motion.button>
               </div>
             </div>

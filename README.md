@@ -8,7 +8,7 @@ Scrollable, animated wedding invitation. Phase 1: frontend only, no backend, no 
 
 ## Sections (scroll order)
 
-1. Envelope intro with wax seal (tap to open)
+1. Cover card closed by a flat olive monogram seal (tap to open)
 2. Names reveal with arch frame and scroll cue
 3. Live countdown to 26.10.2026
 4. Schedule timeline
