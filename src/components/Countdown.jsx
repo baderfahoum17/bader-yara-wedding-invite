@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { weddingDate } from '../content.js'
-import Card from './Card.jsx'
+import { longDate, weddingDate, weekday } from '../content.js'
+import Band, { Title } from './Band.jsx'
 import Reveal from './Reveal.jsx'
-import { Divider } from './Floral.jsx'
+import { ease } from '../motion.js'
 
 function diff(target) {
   const ms = Math.max(0, target.getTime() - Date.now())
@@ -22,22 +22,22 @@ const pad = (n) => String(n).padStart(2, '0')
 function Unit({ value, label }) {
   const text = pad(value)
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-gold/50 bg-ivory/70 shadow-inner sm:h-16 sm:w-16">
+    <div className="flex flex-col items-start">
+      <div className="relative h-[1em] w-full overflow-hidden font-display text-6xl font-light leading-none text-wine md:text-[6.5rem]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={text}
-            className="tabular absolute inset-0 flex items-center justify-center font-display text-2xl text-wine sm:text-3xl"
-            initial={{ y: '60%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '-60%', opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="tabular absolute inset-0 block"
+            initial={{ y: '70%', opacity: 0, filter: 'blur(4px)' }}
+            animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+            exit={{ y: '-70%', opacity: 0, filter: 'blur(4px)' }}
+            transition={{ duration: 0.55, ease }}
           >
             {text}
           </motion.span>
         </AnimatePresence>
       </div>
-      <span className="mt-2 font-display text-[9px] uppercase tracking-[0.3em] text-rose-gold">{label}</span>
+      <span className="mt-4 font-display text-xs uppercase tracking-[0.3em] text-rose-gold md:text-sm">{label}</span>
     </div>
   )
 }
@@ -52,26 +52,32 @@ export default function Countdown() {
   }, [])
 
   return (
-    <Card id="countdown">
-      <Reveal className="text-center">
-        <p className="font-display text-[11px] uppercase tracking-[0.45em] text-rose-gold">Counting down</p>
-        <h2 className="mt-3 font-script text-4xl text-wine">Until we say I do</h2>
-        <Divider color="#c9a45c" className="my-6" />
+    <Band id="countdown" tone="blush">
+      <div className="md:col-span-5">
+        <Reveal>
+          <Title className="text-wine">
+            Until we say <em className="italic">I do</em>
+          </Title>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mt-6 max-w-[30ch] font-display text-xl leading-snug text-ink/70 md:text-2xl">
+            {weekday}, {longDate}
+          </p>
+        </Reveal>
+      </div>
 
+      <Reveal delay={0.2} className="md:col-span-7 md:self-end md:pl-6">
         {t.done ? (
-          <p className="font-display text-xl text-wine">Today is the day</p>
+          <p className="font-display text-5xl text-wine md:text-7xl">Today is the day</p>
         ) : (
-          <div className="flex items-start justify-center gap-2 sm:gap-3" aria-live="polite">
+          <div className="grid grid-cols-4 gap-4 md:gap-8" aria-live="polite">
             <Unit value={t.days} label="Days" />
-            <span className="pt-4 font-display text-2xl text-gold">:</span>
             <Unit value={t.hours} label="Hours" />
-            <span className="pt-4 font-display text-2xl text-gold">:</span>
             <Unit value={t.minutes} label="Min" />
-            <span className="pt-4 font-display text-2xl text-gold">:</span>
             <Unit value={t.seconds} label="Sec" />
           </div>
         )}
       </Reveal>
-    </Card>
+    </Band>
   )
 }

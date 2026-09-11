@@ -1,99 +1,80 @@
 import { motion } from 'framer-motion'
-import { couple, dateLabel, longDate, weekday } from '../content.js'
+import { couple, longDate, venue, weekday } from '../content.js'
 import { Sprig } from './Floral.jsx'
+import { ease } from '../motion.js'
 
-const ease = [0.22, 1, 0.36, 1]
-
-function fade(delay) {
+function rise(active, delay) {
   return {
-    initial: { opacity: 0, y: 18 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.9, ease, delay },
+    initial: { opacity: 0, y: 28, filter: 'blur(10px)' },
+    animate: active ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {},
+    transition: { duration: 1.3, ease, delay },
   }
 }
 
-/** Ornate arch frame with date, couple names in script, and a scroll cue. */
+/**
+ * Opening spread: the names, set large in the script face, with the date and
+ * invitation line beside them. Left-aligned and asymmetric on desktop; stacked on mobile.
+ */
 export default function NamesReveal({ active }) {
   return (
-    <section id="names" className="relative flex min-h-[100dvh] flex-col items-center justify-center px-5 py-16 text-center">
-      <div className="relative w-full max-w-sm">
-        {/* Arch frame */}
-        <svg viewBox="0 0 320 440" className="h-auto w-full" fill="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="archGold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#a5813c" />
-              <stop offset="40%" stopColor="#e6c98a" />
-              <stop offset="60%" stopColor="#c9a45c" />
-              <stop offset="100%" stopColor="#a5813c" />
-            </linearGradient>
-          </defs>
-          <motion.path
-            d="M 20 430 V 160 A 140 140 0 0 1 300 160 V 430"
-            stroke="url(#archGold)"
-            strokeWidth="1.6"
-            initial={{ pathLength: 0 }}
-            animate={active ? { pathLength: 1 } : {}}
-            transition={{ duration: 1.8, ease }}
-          />
-          <motion.path
-            d="M 34 430 V 165 A 126 126 0 0 1 286 165 V 430"
-            stroke="url(#archGold)"
-            strokeWidth="0.7"
-            strokeDasharray="3 5"
-            initial={{ opacity: 0 }}
-            animate={active ? { opacity: 0.8 } : {}}
-            transition={{ duration: 1.2, delay: 0.8 }}
-          />
-          <path d="M 20 430 H 300" stroke="url(#archGold)" strokeWidth="1.6" />
-        </svg>
+    <section id="names" className="texture-wine relative flex min-h-[100dvh] items-center text-ivory">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse 70% 50% at 30% 20%, rgba(201,164,92,0.16), transparent 70%)' }}
+      />
 
-        {/* Floral sprigs framing the arch */}
-        <Sprig color="#d49aa3" className="absolute -left-2 top-[34%] h-10 w-28 -rotate-[70deg]" />
-        <Sprig color="#d49aa3" className="absolute -right-2 top-[34%] h-10 w-28 rotate-[70deg] -scale-x-100" />
-        <Sprig color="#c9a45c" className="absolute left-5 bottom-3 h-7 w-20 -rotate-12" />
-        <Sprig color="#c9a45c" className="absolute right-5 bottom-3 h-7 w-20 rotate-12 -scale-x-100" />
+      <div className="relative mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-y-14 px-6 pb-28 pt-24 md:grid-cols-12 md:items-end md:gap-x-10 md:px-12 md:pb-32">
+        <div className="md:col-span-8">
+          <motion.div {...rise(active, 0.1)}>
+            <Sprig color="#d49aa3" className="mb-8 h-9 w-28" />
+          </motion.div>
 
-        {/* Text inside the arch */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-10 pt-6">
-          <motion.p {...fade(0.4)} className="font-display text-[11px] uppercase tracking-[0.45em] text-gold-light">
-            Wedding Day
-          </motion.p>
-          <motion.p {...fade(0.55)} className="mt-2 font-display text-sm tracking-[0.3em] text-ivory/90">
-            {dateLabel}
-          </motion.p>
-
-          <motion.div {...fade(0.8)} className="my-6 h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent" />
-
-          <motion.h1 {...fade(0.95)} className="font-script leading-[1.1] text-ivory">
-            <span className="block text-6xl sm:text-7xl">{couple.first}</span>
-            <span className="my-1 block font-display text-2xl italic text-gold-light">&amp;</span>
-            <span className="block text-6xl sm:text-7xl">{couple.second}</span>
-          </motion.h1>
-
-          <motion.div {...fade(1.2)} className="my-6 h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent" />
-
-          <motion.p {...fade(1.35)} className="font-body text-base italic text-ivory/80">
-            {weekday}, {longDate}
-          </motion.p>
-          <motion.p {...fade(1.5)} className="mt-3 font-body text-sm text-ivory/70">
-            Together with their families, invite you to celebrate their marriage
-          </motion.p>
+          <h1 className="font-script leading-[0.9] text-ivory">
+            <motion.span {...rise(active, 0.25)} className="block text-[5rem] md:text-[8rem]">
+              {couple.first}
+            </motion.span>
+            <motion.span
+              {...rise(active, 0.4)}
+              className="my-1 block font-display text-3xl italic text-gold-light md:my-2 md:pl-24 md:text-5xl"
+            >
+              &amp;
+            </motion.span>
+            <motion.span {...rise(active, 0.55)} className="block text-[5rem] md:pl-40 md:text-[8rem]">
+              {couple.second}
+            </motion.span>
+          </h1>
         </div>
+
+        <motion.div
+          {...rise(active, 0.9)}
+          className="border-t border-gold/30 pt-8 md:col-span-4 md:border-l md:border-t-0 md:pb-4 md:pl-10 md:pt-0"
+        >
+          <p className="font-display text-2xl leading-tight text-ivory md:text-3xl">{weekday}</p>
+          <p className="font-display text-2xl leading-tight text-ivory md:text-3xl">{longDate}</p>
+          <div className="rule-gold my-7 h-px w-16" />
+          <p className="max-w-[28ch] font-display text-xl leading-snug text-ivory/80">
+            Together with their families, invite you to celebrate their marriage.
+          </p>
+          <p className="mt-5 font-display text-lg text-ivory/60">
+            {venue.name}, {venue.city}
+          </p>
+        </motion.div>
       </div>
 
-      {/* Scroll cue */}
+      {/* Scroll cue: the one idle motion on this screen */}
       <motion.a
         href="#countdown"
-        className="mt-10 flex flex-col items-center gap-2 font-display text-[10px] uppercase tracking-[0.4em] text-gold-light/80"
+        className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 font-display text-xs uppercase tracking-[0.35em] text-gold-light/70"
         initial={{ opacity: 0 }}
         animate={active ? { opacity: 1 } : {}}
-        transition={{ delay: 2, duration: 1 }}
+        transition={{ delay: 2.2, duration: 1.2, ease }}
       >
-        Scroll down
+        Scroll
         <motion.span
-          className="block h-8 w-px bg-gradient-to-b from-gold to-transparent"
-          animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.3, 1, 0.3] }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+          className="block h-10 w-px bg-gradient-to-b from-gold to-transparent"
+          animate={{ scaleY: [0.3, 1, 0.3], opacity: [0.3, 0.9, 0.3] }}
+          transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 2.4 }}
           style={{ transformOrigin: 'top' }}
         />
       </motion.a>

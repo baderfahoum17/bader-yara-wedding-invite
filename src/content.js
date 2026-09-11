@@ -32,12 +32,21 @@ export const venue = {
   name: 'New Grand Palace',
   street: 'HaAvoda 12',
   city: 'Nof HaGalil',
+  // OpenStreetMap position of the hall itself, so the embed pins the building, not a street search.
+  lat: 32.712401,
+  lng: 35.334148,
 }
 
 const venueQuery = encodeURIComponent(`${venue.name}, ${venue.street}, ${venue.city}`)
 
 export const venueLinks = {
-  embed: `https://maps.google.com/maps?q=${venueQuery}&z=15&output=embed`,
+  // Classic embed: pin at exact coordinates, labelled with the venue name, zoomed to the block.
+  embed: `https://maps.google.com/maps?q=${venue.lat},${venue.lng}+(${encodeURIComponent(venue.name)})&z=18&output=embed`,
   google: `https://www.google.com/maps/search/?api=1&query=${venueQuery}`,
-  waze: `https://waze.com/ul?q=${venueQuery}&navigate=yes`,
+  waze: `https://waze.com/ul?ll=${venue.lat},${venue.lng}&navigate=yes`,
+}
+
+export const trunks = {
+  name: 'Trunks',
+  caption: 'Our English Cocker Spaniel is very excited, and would like to sniff you at the reception.',
 }
