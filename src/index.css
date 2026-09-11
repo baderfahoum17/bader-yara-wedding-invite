@@ -124,6 +124,35 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Olive branch (Floral.jsx): the stroke stays a 1px hairline whatever size it is drawn at,
+   so it matches the small sprigs instead of thickening as it scales up. */
+.branch-hairline * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Schedule: the bloom glyph beside "The day" jumps to the ceremony time. The target
+   item answers: its hairline redraws in full olive and the time warms to olive, then both
+   settle back. Makes the jump read even when the item was already on screen (desktop,
+   side by side). Under reduced motion the redraw is dropped and only the colour remains. */
+.schedule-hit-rule {
+  transform-origin: left;
+  animation: schedule-hit-rule 2000ms var(--ease-out-expo) both;
+}
+@keyframes schedule-hit-rule {
+  0% { transform: scaleX(0); opacity: 1; }
+  45% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+.schedule-hit-time {
+  animation: schedule-hit-time 2000ms ease-out both;
+}
+@keyframes schedule-hit-time {
+  0% { color: var(--color-olive-deep); }
+  25% { color: var(--color-olive); }
+  60% { color: var(--color-olive); }
+  100% { color: var(--color-olive-deep); }
+}
+
 /* Cover florals: idle sway. Rotation and drift run on separate elements at different
    periods, so the combined path never repeats on a short cycle. Transform only. */
 .floral-sway {
@@ -166,5 +195,12 @@
   .floral-sway.drift {
     animation: none;
     will-change: auto;
+  }
+  .schedule-hit-rule {
+    animation-name: schedule-hit-rule-still;
+  }
+  @keyframes schedule-hit-rule-still {
+    0%, 45% { transform: none; opacity: 1; }
+    100% { transform: none; opacity: 0; }
   }
 }

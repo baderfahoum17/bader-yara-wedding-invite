@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { couple, longDate, venue, weekday } from '../content.js'
-import { Sprig } from './Floral.jsx'
+import { Branch, Sprig } from './Floral.jsx'
 import { ease, settle } from '../motion.js'
 
 function rise(active, delay) {
@@ -25,6 +25,19 @@ export default function NamesReveal({ active }) {
         className="pointer-events-none absolute inset-0"
         style={{ background: 'radial-gradient(ellipse 70% 50% at 30% 20%, rgba(182,154,132,0.28), transparent 70%)' }}
       />
+
+      {/* Olive branch trailing in from the top-right corner into the empty canvas above the
+          names. Rotated so its base sits at the corner and the tip drapes down and left.
+          Rises with the rest of the sequence, landing between the names and the date. */}
+      <motion.div
+        {...rise(active, 0.95)}
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-14 -top-2 w-[min(70vw,280px)] md:-right-12 md:-top-6 md:w-[460px] lg:w-[560px]"
+      >
+        {/* Mobile: steeper, so it drapes down the empty right edge beside the names.
+            Desktop: nearly horizontal, laid across the empty top-right canvas. */}
+        <Branch color="#6f7452" className="w-full rotate-[158deg] opacity-85 md:rotate-[176deg]" />
+      </motion.div>
 
       <motion.div
         className="relative mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-y-14 px-6 pb-28 pt-24 md:grid-cols-12 md:items-end md:gap-x-10 md:px-12 md:pb-32"
