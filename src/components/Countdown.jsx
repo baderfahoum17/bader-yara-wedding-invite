@@ -23,7 +23,7 @@ function Unit({ value, label }) {
   const text = pad(value)
   return (
     <div className="flex flex-col items-start">
-      <div className="relative h-[1em] w-full overflow-hidden font-display text-6xl font-light leading-none text-wine md:text-[6.5rem]">
+      <div className="relative h-[1em] w-full overflow-hidden font-display text-6xl font-light leading-none text-olive-deep md:text-[6.5rem]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={text}
@@ -37,7 +37,7 @@ function Unit({ value, label }) {
           </motion.span>
         </AnimatePresence>
       </div>
-      <span className="mt-4 font-display text-xs uppercase tracking-[0.3em] text-rose-gold md:text-sm">{label}</span>
+      <span className="mt-4 font-display text-xs uppercase tracking-[0.3em] text-olive md:text-sm">{label}</span>
     </div>
   )
 }
@@ -52,15 +52,15 @@ export default function Countdown() {
   }, [])
 
   return (
-    <Band id="countdown" tone="blush">
+    <Band id="countdown" tone="white">
       <div className="md:col-span-5">
         <Reveal>
-          <Title className="text-wine">
+          <Title>
             Until we say <em className="italic">I do</em>
           </Title>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="mt-6 max-w-[30ch] font-display text-xl leading-snug text-ink/70 md:text-2xl">
+          <p className="mt-6 max-w-[30ch] font-display text-xl leading-snug text-olive-deep/80 md:text-2xl">
             {weekday}, {longDate}
           </p>
         </Reveal>
@@ -68,7 +68,7 @@ export default function Countdown() {
 
       <Reveal delay={0.2} className="md:col-span-7 md:self-end md:pl-6">
         {t.done ? (
-          <p className="font-display text-5xl text-wine md:text-7xl">Today is the day</p>
+          <p className="font-display text-5xl text-olive-deep md:text-7xl">Today is the day</p>
         ) : (
           <div className="grid grid-cols-4 gap-4 md:gap-8" aria-live="polite">
             <Unit value={t.days} label="Days" />

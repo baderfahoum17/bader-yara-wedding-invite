@@ -4,14 +4,24 @@ import { couple, longDate, weekday } from '../content.js'
 import coverArt from '../assets/trunks-cover.jpg'
 import { ease } from '../motion.js'
 
+const shadowRest = '0 50px 90px -30px rgba(58,64,50,0.45)'
+const shadowLift = '0 80px 130px -30px rgba(58,64,50,0.5)'
+const shadowGone = '0 20px 40px -20px rgba(58,64,50,0)'
 
 /**
- * Full-screen cover. The Trunks illustration sits on velvet like a card in hand,
- * closed by a wax seal on its bottom edge. Tap the seal: the seal gives way, the
- * card lifts out of focus, and the invitation underneath takes over.
+ * Full-screen cover. The Trunks illustration sits on taupe linen like a card in hand,
+ * closed by an olive wax seal on its bottom edge.
  *
  * Load sequence is strictly ordered: card, then seal, then words. The only idle
  * motion is a slow ring breathing off the seal.
+ *
+ * Opening sequence, one timeline from the tap:
+ *   0.00s  seal cracks: a fissure draws across it, it swells, turns and gives way
+ *   0.15s  card lifts toward the viewer (scale up, shadow deepens) ...
+ *   0.50s  ... then recedes: shrinks, drops, blurs out
+ *   0.15s  cover words drift out; the mobile monogram rises faster than the card (parallax)
+ *   1.05s  the linen backdrop fades; underneath, the names canvas settles in with a
+ *          slight overshoot (NamesReveal, keyed on `active`), and the names rise after it.
  */
 export default function Cover({ onOpened }) {
   const [stage, setStage] = useState('sealed') // sealed -> opening -> done
@@ -19,8 +29,8 @@ export default function Cover({ onOpened }) {
   const open = () => {
     if (stage !== 'sealed') return
     setStage('opening')
+    setTimeout(onOpened, 1050)
     setTimeout(() => setStage('done'), 1050)
-    setTimeout(onOpened, 1200)
   }
 
   const opening = stage === 'opening'
@@ -30,7 +40,7 @@ export default function Cover({ onOpened }) {
       {stage !== 'done' && (
         <motion.div
           key="cover"
-          className="texture-wine fixed inset-0 z-50 overflow-hidden"
+          className="surface-taupe fixed inset-0 z-50 overflow-hidden text-olive-deep"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7, ease }}
         >
@@ -38,19 +48,16 @@ export default function Cover({ onOpened }) {
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse 60% 55% at 50% 50%, rgba(201,164,92,0.14), transparent 70%)',
-            }}
+            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255,255,255,0.55), transparent 70%)' }}
           />
 
           <div className="mx-auto grid h-full max-w-[1200px] grid-cols-1 content-center justify-items-center gap-y-7 px-5 md:grid-cols-12 md:items-center md:gap-x-10 md:px-12">
             {/* Mobile-only monogram above the card */}
             <motion.p
-              className="font-script text-4xl leading-none text-gold-light md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: opening ? 0 : 1 }}
-              transition={{ duration: 0.9, ease, delay: opening ? 0 : 1.4 }}
+              className="font-script text-4xl leading-none text-olive-deep md:hidden"
+              initial={{ opacity: 0, y: 0 }}
+              animate={opening ? { opacity: 0, y: -34 } : { opacity: 1, y: 0 }}
+              transition={{ duration: opening ? 0.7 : 0.9, ease, delay: opening ? 0.1 : 1.4 }}
             >
               {couple.first} &amp; {couple.second}
             </motion.p>
@@ -58,19 +65,29 @@ export default function Cover({ onOpened }) {
             {/* The card */}
             <div className="relative md:col-span-7 md:justify-self-end">
               <motion.figure
-                className="cover-card relative m-0 overflow-visible"
-                initial={{ opacity: 0, y: 40, scale: 0.98, filter: 'blur(14px)' }}
+                className="cover-card relative m-0 overflow-visible rounded-[6px]"
+                initial={{ opacity: 0, y: 40, scale: 0.98, filter: 'blur(14px)', boxShadow: shadowGone }}
                 animate={
                   opening
-                    ? { opacity: 0, y: -24, scale: 1.05, filter: 'blur(18px)' }
-                    : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+                    ? {
+                        scale: [1, 1.045, 0.9],
+                        y: [0, -14, 48],
+                        opacity: [1, 1, 0],
+                        filter: ['blur(0px)', 'blur(0px)', 'blur(16px)'],
+                        boxShadow: [shadowRest, shadowLift, shadowGone],
+                      }
+                    : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', boxShadow: shadowRest }
                 }
-                transition={{ duration: opening ? 1 : 1.4, ease, delay: opening ? 0.12 : 0.1 }}
+                transition={
+                  opening
+                    ? { duration: 1.0, delay: 0.15, times: [0, 0.34, 1], ease: [0.22, 1, 0.36, 1] }
+                    : { duration: 1.4, ease, delay: 0.1 }
+                }
               >
                 <img
                   src={coverArt}
-                  alt="Gold line illustration of Trunks, an English Cocker Spaniel, on a burgundy watercolor wash"
-                  className="block h-full w-full rounded-[6px] object-cover shadow-[0_50px_90px_-30px_rgba(0,0,0,0.75)]"
+                  alt="Olive line illustration of Trunks, an English Cocker Spaniel, on a bone and taupe watercolor wash"
+                  className="block h-full w-full rounded-[6px] object-cover"
                   draggable="false"
                   fetchPriority="high"
                 />
@@ -82,26 +99,50 @@ export default function Cover({ onOpened }) {
                   type="button"
                   onClick={open}
                   aria-label="Open the invitation"
-                  className="relative block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-gold-light focus-visible:ring-offset-4 focus-visible:ring-offset-wine-deep"
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={opening ? { opacity: 0, scale: 0.82 } : { opacity: 1, scale: 1 }}
-                  transition={{ duration: opening ? 0.35 : 0.8, ease, delay: opening ? 0 : 1.0 }}
+                  className="relative block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-olive focus-visible:ring-offset-4 focus-visible:ring-offset-bone-deep"
+                  initial={{ opacity: 0, scale: 0.6, rotate: 0 }}
+                  animate={
+                    opening
+                      ? { opacity: [1, 1, 0], scale: [1, 1.08, 0.72], rotate: [0, -3, 9] }
+                      : { opacity: 1, scale: 1, rotate: 0 }
+                  }
+                  transition={
+                    opening
+                      ? { duration: 0.5, times: [0, 0.35, 1], ease: [0.4, 0, 0.9, 0.6] }
+                      : { duration: 0.8, ease, delay: 1.0 }
+                  }
                   whileTap={{ scale: 0.94 }}
                 >
                   {!opening && (
                     <motion.span
                       aria-hidden="true"
-                      className="absolute inset-0 rounded-full border border-gold-light/80"
+                      className="absolute inset-0 rounded-full border border-olive/70"
                       initial={{ opacity: 0, scale: 1 }}
                       animate={{ opacity: [0, 0.6, 0], scale: [1, 1.5, 1.7] }}
                       transition={{ duration: 2.6, ease: 'easeOut', delay: 2.4, repeat: Infinity, repeatDelay: 1.2 }}
                     />
                   )}
                   <span className="wax-seal flex h-[88px] w-[88px] items-center justify-center rounded-full md:h-[104px] md:w-[104px]">
-                    <span className="font-script pt-1 text-[2rem] leading-none text-ivory drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] md:text-[2.4rem]">
+                    <span className="font-script pt-1 text-[2rem] leading-none text-bone drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] md:text-[2.4rem]">
                       {couple.initials}
                     </span>
                   </span>
+                  {/* Fissure across the wax */}
+                  {opening && (
+                    <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
+                      <motion.path
+                        d="M12 38 L34 46 L46 34 L58 58 L74 50 L90 66"
+                        fill="none"
+                        stroke="#2c3026"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0, opacity: 0.9 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                      />
+                    </svg>
+                  )}
                 </motion.button>
               </div>
             </div>
@@ -110,18 +151,18 @@ export default function Cover({ onOpened }) {
             <motion.div
               className="pt-8 text-center md:col-span-5 md:pt-0 md:text-left"
               initial={{ opacity: 0, y: 12 }}
-              animate={opening ? { opacity: 0, y: 0 } : { opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease, delay: opening ? 0 : 1.5 }}
+              animate={opening ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
+              transition={{ duration: opening ? 0.5 : 1, ease, delay: opening ? 0.15 : 1.5 }}
             >
-              <h1 className="hidden font-script text-[5.5rem] leading-[0.95] text-ivory md:block">
+              <h1 className="hidden font-script text-[5.5rem] leading-[0.95] text-olive-deep md:block">
                 {couple.first}
-                <span className="mx-4 font-display text-4xl italic text-gold-light">&amp;</span>
+                <span className="mx-4 font-display text-4xl italic text-olive">&amp;</span>
                 {couple.second}
               </h1>
-              <p className="hidden pt-6 font-display text-2xl text-ivory/85 md:block">
+              <p className="hidden pt-6 font-display text-2xl text-olive-deep/80 md:block">
                 {weekday}, {longDate}
               </p>
-              <p className="font-display text-base uppercase tracking-[0.3em] text-gold-light/85 md:pt-10 md:text-sm">
+              <p className="font-display text-base uppercase tracking-[0.3em] text-olive-deep/80 md:pt-10 md:text-sm">
                 Tap the seal to open
               </p>
             </motion.div>

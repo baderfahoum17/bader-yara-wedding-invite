@@ -29,12 +29,14 @@ for (const dev of devices) {
   await page.goto(url, { waitUntil: 'networkidle' })
   await page.waitForTimeout(3200)
   const r = {}
-  r.coverImg = await page.locator('img[alt^="Gold line illustration of Trunks"]').evaluate((i) => i.complete && i.naturalWidth > 0)
+  r.coverImg = await page.locator('img[alt^="Olive line illustration of Trunks"]').evaluate((i) => i.complete && i.naturalWidth > 0)
   r.seal = await page.getByRole('button', { name: 'Open the invitation' }).isVisible()
   await shot('01-cover')
 
   await page.getByRole('button', { name: 'Open the invitation' }).click()
-  await page.waitForTimeout(3200)
+  await page.waitForTimeout(520)
+  await shot('01b-opening')
+  await page.waitForTimeout(2700)
   r.coverGone = (await page.getByRole('button', { name: 'Open the invitation' }).count()) === 0
   await shot('02-names')
 
