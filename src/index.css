@@ -125,8 +125,47 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Cover florals: idle sway. Rotation and drift run on separate elements at different
+   periods, so the combined path never repeats on a short cycle. Transform only. */
+.floral-sway {
+  will-change: transform;
+  animation-duration: var(--sway-duration);
+  animation-delay: var(--sway-delay);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.floral-sway.rotate {
+  animation-name: floral-rotate;
+}
+.floral-sway.drift {
+  animation-name: floral-drift;
+}
+@keyframes floral-rotate {
+  0%,
+  100% {
+    transform: rotate(calc(var(--sway-rotate) * -1));
+  }
+  50% {
+    transform: rotate(var(--sway-rotate));
+  }
+}
+@keyframes floral-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--sway-x), var(--sway-y), 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .floral-sway.rotate,
+  .floral-sway.drift {
+    animation: none;
+    will-change: auto;
   }
 }

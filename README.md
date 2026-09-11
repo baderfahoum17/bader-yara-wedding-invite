@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Copy lives in `src/content.js`. Swap the cameo photo in `src/assets/` and update the import in `src/App.jsx`.
+Copy lives in `src/content.js`. The cover florals (assets, anchors, sway, and open-drift) are configured in `src/florals.js`; the B&Y monogram is inline SVG in `src/components/Monogram.jsx`. Swap the cameo photo in `src/assets/` and update the import in `src/App.jsx`.
 
 ## Deploy (manual, no CI)
 

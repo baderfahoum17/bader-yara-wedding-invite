@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { couple, longDate, weekday } from '../content.js'
 import coverArt from '../assets/trunks-cover.jpg'
 import { ease } from '../motion.js'
+import Monogram from './Monogram.jsx'
+import CoverFlorals from './CoverFlorals.jsx'
 
 const shadowRest = '0 50px 90px -30px rgba(58,64,50,0.45)'
 const shadowLift = '0 80px 130px -30px rgba(58,64,50,0.5)'
@@ -12,13 +14,14 @@ const shadowGone = '0 20px 40px -20px rgba(58,64,50,0)'
  * Full-screen cover. The Trunks illustration sits on taupe linen like a card in hand,
  * closed by an olive wax seal on its bottom edge.
  *
- * Load sequence is strictly ordered: card, then seal, then words. The only idle
- * motion is a slow ring breathing off the seal.
+ * Load sequence is strictly ordered: card, florals, seal, then words. Idle motion is a
+ * slow ring breathing off the seal and the florals swaying (CoverFlorals, CSS-driven).
  *
  * Opening sequence, one timeline from the tap:
  *   0.00s  seal cracks: a fissure draws across it, it swells, turns and gives way
  *   0.15s  card lifts toward the viewer (scale up, shadow deepens) ...
  *   0.50s  ... then recedes: shrinks, drops, blurs out
+ *   0.15s  florals part outward and fade as the card lifts (CoverFlorals)
  *   0.15s  cover words drift out; the mobile monogram rises faster than the card (parallax)
  *   1.05s  the linen backdrop fades; underneath, the names canvas settles in with a
  *          slight overshoot (NamesReveal, keyed on `active`), and the names rise after it.
@@ -53,19 +56,20 @@ export default function Cover({ onOpened }) {
 
           <div className="mx-auto grid h-full max-w-[1200px] grid-cols-1 content-center justify-items-center gap-y-7 px-5 md:grid-cols-12 md:items-center md:gap-x-10 md:px-12">
             {/* Mobile-only monogram above the card */}
-            <motion.p
-              className="font-script text-4xl leading-none text-olive-deep md:hidden"
+            <motion.div
+              className="text-olive-deep md:hidden"
               initial={{ opacity: 0, y: 0 }}
               animate={opening ? { opacity: 0, y: -34 } : { opacity: 1, y: 0 }}
               transition={{ duration: opening ? 0.7 : 0.9, ease, delay: opening ? 0.1 : 1.4 }}
             >
-              {couple.first} &amp; {couple.second}
-            </motion.p>
+              <Monogram className="h-[4.25rem] w-auto" title={`${couple.first} & ${couple.second}`} />
+            </motion.div>
 
-            {/* The card */}
+            {/* The card, framed by florals behind (z-0) and in front of (z-20) its edge */}
             <div className="relative md:col-span-7 md:justify-self-end">
+              <CoverFlorals layer="behind" opening={opening} />
               <motion.figure
-                className="cover-card relative m-0 overflow-visible rounded-[6px]"
+                className="cover-card relative z-10 m-0 overflow-visible rounded-[6px]"
                 initial={{ opacity: 0, y: 40, scale: 0.98, filter: 'blur(14px)', boxShadow: shadowGone }}
                 animate={
                   opening
@@ -92,9 +96,10 @@ export default function Cover({ onOpened }) {
                   fetchPriority="high"
                 />
               </motion.figure>
+              <CoverFlorals layer="front" opening={opening} />
 
               {/* Wax seal on the bottom edge: the one tap target */}
-              <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2">
+              <div className="absolute left-1/2 top-full z-30 -translate-x-1/2 -translate-y-1/2">
                 <motion.button
                   type="button"
                   onClick={open}
@@ -123,9 +128,7 @@ export default function Cover({ onOpened }) {
                     />
                   )}
                   <span className="wax-seal flex h-[88px] w-[88px] items-center justify-center rounded-full md:h-[104px] md:w-[104px]">
-                    <span className="font-script pt-1 text-[2rem] leading-none text-bone drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] md:text-[2.4rem]">
-                      {couple.initials}
-                    </span>
+                    <Monogram className="h-[50px] w-auto text-bone drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] md:h-[58px]" />
                   </span>
                   {/* Fissure across the wax */}
                   {opening && (
